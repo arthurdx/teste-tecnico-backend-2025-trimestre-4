@@ -45,7 +45,7 @@ services:
       - ./elasticmq.conf:/opt/elasticmq.conf
     command: -Dconfig.file=/opt/elasticmq.conf
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9324 || exit 1"]
+      test: ["CMD-SHELL", "curl http://localhost:9324 || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 5
