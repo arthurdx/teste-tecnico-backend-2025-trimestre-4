@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+      elasticmq:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MONGO_URI=mongodb://mongo:27017/cep-crawler
+      - SQS_ENDPOINT=http://elasticmq:9324
+      - SQS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=dummy
+      - AWS_SECRET_ACCESS_KEY=dummy
+      - QUEUE_URL=http://elasticmq:9324/000000000000/cep_crawl_tasks
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  elasticmq:
+    image: softwaremill/elasticmq
+    ports:
+      - "9324:9324"
+      - "9325:9325"
+    volumes:
+      - ./elasticmq.conf:/opt/elasticmq.conf
+    command: -Dconfig.file=/opt/elasticmq.conf
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9324 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongo_data:
