@@ -1,18 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { SQSClient, ListQueuesCommand } = require('@aws-sdk/client-sqs');
+const cepRoutes = require('./routes/cepRoutes');
+const { sqsClient } = require('./services/sqs');
+const { ListQueuesCommand } = require('@aws-sdk/client-sqs');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const sqsClient = new SQSClient({
-  endpoint: process.env.SQS_ENDPOINT || 'http://localhost:9324',
-  region: process.env.SQS_REGION || 'us-east-1',
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'dummy',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'dummy',
-  },
-});
+app.use(express.json());
+
+app.use('/cep', cepRoutes);
 
 async function checkConnections() {
   console.log('--- Checking Connections ---');
