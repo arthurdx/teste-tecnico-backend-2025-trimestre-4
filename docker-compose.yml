@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -23,6 +21,26 @@ services:
       - .:/app
       - /app/node_modules
     command: npm run dev
+
+  worker:
+    build: .
+    depends_on:
+      mongo:
+        condition: service_healthy
+      elasticmq:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://mongo:27017/cep-crawler
+      - SQS_ENDPOINT=http://elasticmq:9324
+      - SQS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=dummy
+      - AWS_SECRET_ACCESS_KEY=dummy
+      - QUEUE_URL=http://elasticmq:9324/000000000000/cep_crawl_tasks
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run worker
 
   mongo:
     image: mongo:6
