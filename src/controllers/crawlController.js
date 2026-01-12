@@ -2,6 +2,7 @@ const { SendMessageCommand } = require('@aws-sdk/client-sqs');
 const { sqsClient } = require('../services/sqs');
 const CrawlRequest = require("../models/CrawlRequest");
 const CrawlResult = require('../models/CrawlResult');
+const { validateCEPRange } = require('../utils/validation');
 
 /**
  * 
@@ -12,10 +13,14 @@ const CrawlResult = require('../models/CrawlResult');
 async function createCrawl(req, res) {
     try {
         const { cep_start, cep_end } = req.body;
-        if (!cep_start || !cep_end) return res.status(400).json({ error: 'Missing range' })
+        
+        const validation = validateCEPRange(cep_start, cep_end);
+        if(!validation.isValid) {
+            return res.status(400).json({ error: validation.error });
+        }
 
-        const start = parseInt(cep_start)
-        const end = parseInt(cep_end);
+        const start = parseInt(cep_start, 10);
+        const end = parseInt(cep_end, 10);
 
         const newCrawl = await CrawlRequest.create({
             params: { cep_start, cep_end },
@@ -24,7 +29,7 @@ async function createCrawl(req, res) {
 
 
         for (let i = start; i <= end; i++) {
-            cepNumber = i.toString().padStart(8, '0');
+            const cepNumber = i.toString().padStart(8, '0');
             const messageBody = {
                 crawl_id: newCrawl.crawl_id,
                 cep: cepNumber
