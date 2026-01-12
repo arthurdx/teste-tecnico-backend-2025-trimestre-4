@@ -31,16 +31,32 @@ async function createCrawl(req, res) {
 
             await sqsClient.send(command);    
         }
-        res.status(202).json({
-                message: "Crawl started",
-                crawl_id: newCrawl.crawl_id
-            });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            error: "Internal Server Error"
-        })
-    }
-}
-
-module.exports = { createCrawl }
+                    res.status(202).json({
+                        message: "Crawl started",
+                        crawl_id: newCrawl.crawl_id
+                    });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({
+                    error: "Internal Server Error"
+                })
+            }
+        }
+        
+        async function getCrawlStatus(req, res) {
+            try {
+                const { crawl_id } = req.params;
+                const crawl = await CrawlRequest.findOne({ crawl_id });
+        
+                if (!crawl) {
+                    return res.status(404).json({ error: "Crawl request not found" });
+                }
+        
+                res.json(crawl);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: "Internal Server Error" });
+            }
+        }
+        
+        module.exports = { createCrawl, getCrawlStatus }
