@@ -145,3 +145,57 @@ Este teste busca avaliar as seguintes competências:
 6. Domínio sobre a runtime `node.js`;
 7. Capacidade de organização de código e separação de responsabilidades;
 8. Capacidade de lidar com contêineres Docker e ambientes compostos.
+
+---
+---
+
+# Implementação e Execução
+
+Abaixo estão os detalhes de como executar a solução desenvolvida.
+
+## Como Executar
+
+Este projeto foi totalmente containerizado. Para iniciar:
+
+1.  Certifique-se de ter **Docker** e **Docker Compose** instalados.
+2.  Clone este repositório.
+3.  Na raiz do projeto, execute:
+
+```bash
+docker-compose up --build
+```
+
+O ambiente subirá os seguintes serviços:
+*   **App (API):** `http://localhost:3000`
+*   **Worker:** Processamento em background (logs visíveis no terminal).
+*   **ElasticMQ (Dashboard):** `http://localhost:9325` (Útil para monitorar a fila).
+*   **MongoDB:** Banco de dados.
+
+## Documentação da API (Bruno)
+
+Uma coleção completa de requisições para o [Bruno API Client](https://www.usebruno.com/) está disponível na pasta [`docs/CEP Crawler`](./docs/CEP%20Crawler).
+
+Você pode importar essa pasta diretamente no Bruno para testar os endpoints.
+
+### Endpoints Disponíveis
+
+#### 1. Iniciar Crawl (`POST /cep/crawl`)
+Envia um range de CEPs para a fila.
+
+**Exemplo de Body:**
+```json
+{
+  "cep_start": "36773076",
+  "cep_end": "36773150"
+}
+```
+
+#### 2. Consultar Status (`GET /cep/crawl/:crawl_id`)
+Acompanhe o progresso em tempo real (Total, Processados, Sucessos, Erros).
+
+#### 3. Consultar Resultados (`GET /cep/crawl/:crawl_id/results`)
+Retorna os dados obtidos do ViaCEP com paginação.
+
+**Parâmetros de Query:**
+*   `page`: Número da página (padrão: 1)
+*   `limit`: Itens por página (padrão: 20)
