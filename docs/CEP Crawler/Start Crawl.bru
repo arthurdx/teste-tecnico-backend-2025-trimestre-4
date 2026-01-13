@@ -1,0 +1,23 @@
+meta {
+  name: Start Crawl
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/cep/crawl
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "cep_start": "36773076",
+    "cep_end": "36773150"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

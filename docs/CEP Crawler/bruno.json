@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "CEP Crawler",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Get Crawl Results
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:3000/cep/crawl/:crawl_id/results
+  body: none
+  auth: inherit
+}
+
+params:path {
+  crawl_id: ecf546c5-4ef3-4a61-b81f-dd4fe17a154d
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
